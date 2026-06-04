@@ -1,0 +1,101 @@
+# Node
+node_modules/
+.env
+.env.*
+.turbo/
+dist/
+build/
+.next/
+coverage/
+*.log
+*.sqlite
+*.local
+*.DS_Store
+
+# Binary files - DO NOT commit executables
+*.exe
+*.dll
+*.pdb
+*.zip
+*.tar.gz
+
+# Redis (use package manager to install)
+redis/
+redis-windows.zip
+
+# Data files
+*.csv
+*.xlsx
+*.xls
+*.doc
+*.docx
+*.ppt
+*.pptx
+*.rtf
+
+# Deployment artifacts (build via CI/CD)
+deployment-package/
+
+# Prisma
+prisma/.env
+prisma/dev.db
+prisma/migrations/*/README.md
+packages/database/prisma/generated/
+packages/database/prisma/archive/
+
+# Generated/uploaded files
+apps/api/public/generated_memos/
+apps/web/public/uploads/
+apps/web/public/signatures/
+apps/web/public/evidence/
+apps/web/mkcert/
+
+# Secrets and key material
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.der
+*.jks
+
+# VSCode
+.vscode/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Docker
+*.pid
+
+# Patch files
+*.patch
+
+# Development server only - watermark component (dev server only, not for production)
+apps/web/components/ui/development-watermark.tsx
+
+# Misc
+.idea/
+*.swp
+*.swo
+*.bak
+*.tmp
+*.orig
+*.backup
+*.old
+*.new
+
+# Local database data and tool logs (do not commit)
+.local-postgres/
+.codex-runlogs/
+.codex-temp/
+.codex-logs/
+.pnpm-store/

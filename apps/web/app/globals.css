@@ -1,0 +1,403 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "leaflet/dist/leaflet.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* NORED Desk Theme Overrides */
+@import "../styles/theme-overrides.css";
+
+/* Custom scrollbar styling for dropdown menus and overflow containers */
+.overflow-y-auto::-webkit-scrollbar,
+[data-slot="dropdown-menu-content"]::-webkit-scrollbar,
+.mega-menu-scrollable::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track,
+[data-slot="dropdown-menu-content"]::-webkit-scrollbar-track,
+.mega-menu-scrollable::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  margin: 4px 0;
+}
+
+.dark .overflow-y-auto::-webkit-scrollbar-track,
+.dark [data-slot="dropdown-menu-content"]::-webkit-scrollbar-track,
+.dark .mega-menu-scrollable::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb,
+[data-slot="dropdown-menu-content"]::-webkit-scrollbar-thumb,
+.mega-menu-scrollable::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.dark .overflow-y-auto::-webkit-scrollbar-thumb,
+.dark [data-slot="dropdown-menu-content"]::-webkit-scrollbar-thumb,
+.dark .mega-menu-scrollable::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover,
+[data-slot="dropdown-menu-content"]::-webkit-scrollbar-thumb:hover,
+.mega-menu-scrollable::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.4);
+  background-clip: padding-box;
+}
+
+.dark .overflow-y-auto::-webkit-scrollbar-thumb:hover,
+.dark [data-slot="dropdown-menu-content"]::-webkit-scrollbar-thumb:hover,
+.dark .mega-menu-scrollable::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+  background-clip: padding-box;
+}
+
+/* Dropdown menu scrollable indicators */
+[data-slot="dropdown-menu-content"] {
+  position: relative;
+}
+
+/* Fade indicator at top when scrolled */
+[data-slot="dropdown-menu-content"]::before {
+  content: '';
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background: linear-gradient(to bottom, hsl(var(--popover)), transparent);
+  pointer-events: none;
+  z-index: 1;
+  display: block;
+  margin-bottom: -12px;
+}
+
+/* Fade indicator at bottom when scrollable */
+[data-slot="dropdown-menu-content"]::after {
+  content: '';
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background: linear-gradient(to bottom, transparent, hsl(var(--popover)));
+  pointer-events: none;
+  z-index: 1;
+  display: block;
+  margin-top: -12px;
+}
+
+:root {
+  /* NORED brand palette */
+  --background: oklch(92.884% 0.0054 16.178);
+  --foreground: oklch(0.24 0.05 20);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.24 0.05 20);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.24 0.05 20);
+  /* NORED primary red */
+  --primary: oklch(0.58 0.21 27);
+  --primary-foreground: oklch(1 0 0);
+  --accent-orange: oklch(0.7 0.16 34);
+  --accent-gold: oklch(0.63 0.18 27);
+  --secondary: oklch(0.95 0.01 20);
+  --secondary-foreground: oklch(0.24 0.05 20);
+  --muted: oklch(0.97 0.003 20);
+  --muted-foreground: oklch(0.52 0.03 20);
+  --accent: oklch(0.96 0.015 20);
+  --accent-foreground: oklch(0.24 0.05 20);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.91 0.008 20);
+  --input: oklch(0.98 0 0);
+  --ring: oklch(0.58 0.21 27);
+  --chart-1: oklch(0.58 0.21 27);
+  --chart-2: oklch(0.68 0.17 38);
+  --chart-3: oklch(0.7 0.18 52);
+  --chart-4: oklch(0.44 0.14 18);
+  --chart-5: oklch(0.627 0.265 303.9);
+  --radius: 4px;
+  --sidebar: oklch(0.995 0 0);
+  --sidebar-foreground: oklch(0.32 0.03 20);
+  --sidebar-primary: oklch(0.58 0.21 27);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.97 0.01 20);
+  --sidebar-accent-foreground: oklch(0.24 0.05 20);
+  --sidebar-border: oklch(0.93 0.008 20);
+  --sidebar-ring: oklch(0.58 0.21 27);
+}
+
+.dark {
+  /* Dark mode color palette */
+  --background: oklch(0.16 0.025 20);
+  --foreground: oklch(0.95 0.01 20);
+  --card: oklch(0.2 0.025 20);
+  --card-foreground: oklch(0.95 0.01 20);
+  --popover: oklch(0.2 0.025 20);
+  --popover-foreground: oklch(0.95 0.01 20);
+  --primary: oklch(0.7 0.18 27);
+  --primary-foreground: oklch(1 0 0);
+  --accent-orange: oklch(0.7 0.16 34);
+  --accent-gold: oklch(0.63 0.18 27);
+  --secondary: oklch(0.24 0.015 20);
+  --secondary-foreground: oklch(0.95 0.01 20);
+  --muted: oklch(0.24 0.015 20);
+  --muted-foreground: oklch(0.7 0.015 20);
+  --accent: oklch(0.24 0.015 20);
+  --accent-foreground: oklch(0.95 0.01 20);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.28 0.02 20);
+  --input: oklch(0.22 0.02 20);
+  --ring: oklch(0.7 0.18 27);
+  --chart-1: oklch(0.7 0.18 27);
+  --chart-2: oklch(0.68 0.17 38);
+  --chart-3: oklch(0.7 0.18 52);
+  --chart-4: oklch(0.5 0.16 18);
+  --chart-5: oklch(0.627 0.265 303.9);
+  --sidebar: oklch(0.2 0.025 20);
+  --sidebar-foreground: oklch(0.88 0.01 20);
+  --sidebar-primary: oklch(0.7 0.18 27);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.24 0.015 20);
+  --sidebar-accent-foreground: oklch(0.95 0.01 20);
+  --sidebar-border: oklch(0.28 0.02 20);
+  --sidebar-ring: oklch(0.7 0.18 27);
+}
+
+@theme inline {
+  /* Updated to use Nunito font */
+  --font-sans: "Nunito", "Nunito Fallback", system-ui, -apple-system, sans-serif;
+  --font-mono: "Geist Mono", "Geist Mono Fallback";
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent-orange: var(--accent-orange);
+  --color-accent-gold: var(--accent-gold);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: 2px;
+  --radius-md: var(--radius);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 2px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/* ============================================
+   Dashboard Container & Card Styles
+   ============================================ */
+
+/* Base container/card style with soft shadow */
+.card-shadow {
+  background-color: white;
+  border: none;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.dark .card-shadow {
+  background-color: oklch(0.18 0.01 250);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Hover effect for interactive cards */
+.card-shadow-hover {
+  background-color: white;
+  border: none;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  transition: all 0.15s ease-in-out;
+}
+
+.dark .card-shadow-hover {
+  background-color: oklch(0.18 0.01 250);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.card-shadow-hover:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+}
+
+.dark .card-shadow-hover:hover {
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* KPI card specific style */
+.kpi-card {
+  background-color: white;
+  border: none;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  padding: clamp(8px, 2vw, 14px);
+  transition: all 0.15s ease-in-out;
+  cursor: pointer;
+}
+
+.dark .kpi-card {
+  background-color: oklch(0.18 0.01 250);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.kpi-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+}
+
+.dark .kpi-card:hover {
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Widget card style */
+.widget-card {
+  background-color: white;
+  border: none;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.dark .widget-card {
+  background-color: oklch(0.18 0.01 250);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Badge/pill container style */
+.badge-container {
+  background-color: white;
+  border: none;
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.dark .badge-container {
+  background-color: oklch(0.18 0.01 250);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    position: relative;
+  }
+
+  /* Subtle dot pattern background for consistency across the system */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(
+      circle,
+      oklch(0.58 0.21 27 / 0.02) 1px,
+      transparent 1px
+    );
+    background-size: 24px 24px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .dark body::before {
+    background-image: radial-gradient(
+      circle,
+      oklch(0.7 0.18 27 / 0.06) 1px,
+      transparent 1px
+    );
+  }
+
+  /* Login left panel pattern and accent overlays */
+  .login-pattern::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(
+        circle at 14% 14%,
+        rgba(255, 255, 255, 0.03) 1px,
+        transparent 1px
+      ),
+      radial-gradient(
+        circle at 70% 30%,
+        rgba(255, 255, 255, 0.015) 1px,
+        transparent 1px
+      );
+    background-size: 20px 20px, 34px 34px;
+    opacity: 0.9;
+    pointer-events: none;
+    mix-blend-mode: overlay;
+    z-index: 0;
+  }
+
+  /* Card tweaks for modern look */
+  .auth-card {
+    background-color: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 10px 30px rgba(2, 6, 23, 0.18);
+    border-radius: 4px;
+  }
+
+  .auth-card img {
+    background: transparent;
+    display: block;
+  }
+
+  .login-pattern .grid,
+  .login-pattern .text-center,
+  .login-pattern > * {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+/* Cursor pointer for interactive elements */
+a,
+button,
+[role="button"],
+[type="button"],
+[type="submit"],
+.cursor-pointer {
+  cursor: pointer;
+}
+
+/* Ensure disabled elements show not-allowed cursor */
+button:disabled,
+[disabled] {
+  cursor: not-allowed;
+}

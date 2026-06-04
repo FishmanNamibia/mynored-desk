@@ -1,0 +1,1825 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model ADConfig {
+  id           String    @id
+  domain       String    @unique
+  url          String
+  bindDN       String
+  bindPassword String
+  groupRoleMap Json
+  enabled      Boolean   @default(true)
+  lastSync     DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime
+}
+
+model AdhocTask {
+  id                                String    @id
+  title                             String
+  description                       String?
+  priority                          String    @default("MEDIUM")
+  dueDate                           DateTime?
+  assignedToId                      String
+  createdById                       String
+  status                            String    @default("NOT_STARTED")
+  percentComplete                   Int       @default(0)
+  evidenceUrl                       String?
+  evidenceNotes                     String?
+  rating                            Int?
+  approvalStatus                    String?   @default("PENDING")
+  approvedById                      String?
+  approvedAt                        DateTime?
+  progressNotes                     String?
+  completedAt                       DateTime?
+  createdAt                         DateTime  @default(now())
+  updatedAt                         DateTime
+  approvedByUser User?     @relation("AdhocTask_approvedByIdToUser", fields: [approvedById], references: [id])
+  assignedTo      User      @relation("AdhocTask_assignedToIdToUser", fields: [assignedToId], references: [id], onDelete: Cascade)
+  createdBy       User      @relation("AdhocTask_createdByIdToUser", fields: [createdById], references: [id])
+
+  @@index([approvedById])
+  @@index([assignedToId])
+  @@index([createdById])
+  @@index([status])
+}
+
+model AuditTask {
+  id                                String    @id
+  title                             String
+  description                       String?
+  priority                          String    @default("MEDIUM")
+  dueDate                           DateTime?
+  assignedToId                      String
+  createdById                       String
+  status                            String    @default("NOT_STARTED")
+  percentComplete                   Int       @default(0)
+  evidenceUrl                       String?
+  evidenceNotes                     String?
+  rating                            Int?
+  approvalStatus                    String?   @default("PENDING")
+  approvedById                      String?
+  approvedAt                        DateTime?
+  progressNotes                     String?
+  completedAt                       DateTime?
+  createdAt                         DateTime  @default(now())
+  updatedAt                         DateTime
+  actionPlan                        String?
+  businessObjective                 String?
+  condition                         String?
+  controlAssessment                 String?   @default("PENDING")
+  criteria                          String?
+  estimatedCompletionDate           DateTime?
+  impact                            String?
+  managementActionPlan              String?
+  personResponsible                 String?
+  recommendation                    String?
+  riskExposure                      String?
+  riskRanking                       String?   @default("MEDIUM")
+  rootCause                         String?
+  approvedByUser User?     @relation("AuditTask_approvedByIdToUser", fields: [approvedById], references: [id])
+  assignedTo      User      @relation("AuditTask_assignedToIdToUser", fields: [assignedToId], references: [id], onDelete: Cascade)
+  createdBy       User      @relation("AuditTask_createdByIdToUser", fields: [createdById], references: [id])
+
+  @@index([approvedById])
+  @@index([assignedToId])
+  @@index([createdById])
+  @@index([status])
+}
+
+model Boardroom {
+  id               String             @id
+  name             String
+  location         String?
+  capacity         Int?
+  amenities        String?
+  isAvailable      Boolean            @default(true)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @default(now())
+  BoardroomRequest BoardroomRequest[]
+}
+
+model BoardroomRequest {
+  id          String    @id
+  requestId   String
+  boardroomId String
+  startTime   DateTime
+  endTime     DateTime
+  purpose     String
+  attendees   Int
+  Boardroom   Boardroom @relation(fields: [boardroomId], references: [id], onUpdate: NoAction)
+  Request     Request   @relation(fields: [requestId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([requestId, boardroomId])
+}
+
+model DashboardEvent {
+  id          String   @id
+  title       String
+  date        String
+  time        String
+  location    String
+  description String?
+  createdById String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime
+  createdBy   User     @relation(fields: [createdById], references: [id])
+
+  @@index([createdById])
+  @@index([isActive])
+}
+
+model DashboardNews {
+  id          String   @id
+  title       String
+  excerpt     String
+  category    String
+  date        String
+  icon        String?  @default("TrendingUp")
+  createdById String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime
+  createdBy   User     @relation(fields: [createdById], references: [id])
+
+  @@index([category])
+  @@index([createdById])
+  @@index([isActive])
+}
+
+model DashboardNotice {
+  id          String   @id
+  title       String
+  message     String
+  type        String   @default("info")
+  department  String?
+  createdById String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime
+  createdBy   User     @relation(fields: [createdById], references: [id])
+
+  @@index([createdById])
+  @@index([isActive])
+}
+
+model Department {
+  id               String        @id
+  code             String        @unique
+  name             String
+  parentId         String?
+  managerId        String?
+  managerName      String?
+  managerEmail     String?
+  adSyncedAt       DateTime?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime
+  parent           Department?   @relation("DepartmentToDepartment", fields: [parentId], references: [id])
+  children         Department[]  @relation("DepartmentToDepartment")
+  ITEquipment      ITEquipment[]
+  License          License[]
+  Project          Project[]
+  users            User[]
+  Vacancy          Vacancy[]
+}
+
+model Goal {
+  id              String      @id
+  goalNumber      String
+  title           String
+  description     String?
+  startDate       DateTime
+  endDate         DateTime
+  performanceYear String      @default("2024/25")
+  bscPerspective  String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime
+  objectives      Objective[]
+
+  @@index([endDate])
+  @@index([goalNumber])
+  @@index([performanceYear])
+  @@index([startDate])
+}
+
+model ITEquipment {
+  id                 String               @id
+  name               String
+  category           String
+  brand              String?
+  model              String?
+  serialNumber       String?              @unique
+  assetTag           String?              @unique
+  quantity           Int                  @default(0)
+  givenOut           Int                  @default(0)
+  condition          EquipmentCondition   @default(GOOD)
+  departmentId       String?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @default(now())
+  Department         Department?          @relation(fields: [departmentId], references: [id], onUpdate: NoAction)
+  ITEquipmentRequest ITEquipmentRequest[]
+
+  @@index([category])
+  @@index([condition])
+}
+
+model ITEquipmentRequest {
+  id                String       @id
+  requestId         String
+  equipmentId       String?
+  quantityRequested Int
+  quantityApproved  Int?
+  purpose           String?
+  returnDate        DateTime?
+  ITEquipment       ITEquipment? @relation(fields: [equipmentId], references: [id], onUpdate: NoAction)
+  Request           Request      @relation(fields: [requestId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([requestId, equipmentId])
+}
+
+model Initiative {
+  id                      String                 @id
+  number                  String?
+  title                   String
+  description             String?
+  measure                 String?
+  action                  String?
+  reportingPeriods        String[]
+  quarterDates            Json?
+  target                  String?
+  dueDate                 DateTime?
+  primaryResponsibility   String?
+  secondaryResponsibility String?
+  status                  String?                @default("NOT_STARTED")
+  percentComplete         Int?                   @default(0)
+  progressNotes           String?
+  evidenceUrl             String?
+  evidenceNotes           String?
+  rating                  Int?
+  objectiveId             String
+  createdAt               DateTime               @default(now())
+  updatedAt               DateTime
+  objective               Objective              @relation(fields: [objectiveId], references: [id], onDelete: Cascade)
+  performanceAgreements   PerformanceAgreement[]
+  targets                 Target[]
+
+  @@index([objectiveId])
+  @@index([primaryResponsibility])
+  @@index([secondaryResponsibility])
+}
+
+model LeaveRequest {
+  id        String      @id
+  userId    String
+  startDate DateTime
+  endDate   DateTime
+  reason    String
+  status    LeaveStatus
+  User      User        @relation(fields: [userId], references: [id])
+}
+
+model License {
+  id               String           @id
+  licenseKey       String           @unique
+  licenseType      LicenseType
+  status           LicenseStatus    @default(ACTIVE)
+  vendorId         String
+  systemId         String
+  departmentId     String?
+  productName      String
+  version          String?
+  edition          String?
+  userCount        Int?
+  description      String?
+  purchaseDate     DateTime
+  startDate        DateTime
+  expiryDate       DateTime
+  lastRenewedDate  DateTime?
+  renewalFrequency RenewalFrequency
+  autoRenew        Boolean          @default(false)
+  renewalCost      Decimal?         @db.Decimal(10, 2)
+  currency         String           @default("NAD")
+  alertThreshold   Int              @default(30)
+  supportContact   String?
+  supportEmail     String?
+  supportPhone     String?
+  documentationUrl String?
+  notes            String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime
+  Department       Department?      @relation(fields: [departmentId], references: [id])
+  System           System           @relation(fields: [systemId], references: [id])
+  Vendor           Vendor           @relation(fields: [vendorId], references: [id])
+  LicenseAlert     LicenseAlert[]
+  LicenseRenewal   LicenseRenewal[]
+
+  @@index([expiryDate])
+  @@index([licenseType])
+  @@index([status])
+}
+
+model LicenseAlert {
+  id               String        @id
+  licenseId        String
+  alertType        AlertType
+  severity         AlertSeverity
+  message          String
+  daysUntilExpiry  Int
+  notificationSent Boolean       @default(false)
+  notifiedAt       DateTime?
+  taskCreated      Boolean       @default(false)
+  taskId           String?
+  acknowledged     Boolean       @default(false)
+  acknowledgedBy   String?
+  acknowledgedAt   DateTime?
+  createdAt        DateTime      @default(now())
+  License          License       @relation(fields: [licenseId], references: [id])
+  Task             Task?         @relation(fields: [taskId], references: [id])
+
+  @@index([acknowledged])
+  @@index([licenseId])
+  @@index([notificationSent])
+}
+
+model LicenseRenewal {
+  id                 String            @id
+  licenseId          String
+  renewalDate        DateTime
+  previousExpiryDate DateTime
+  newExpiryDate      DateTime
+  cost               Decimal?          @db.Decimal(10, 2)
+  currency           String            @default("NAD")
+  status             RenewalStatus     @default(PENDING)
+  workflowInstanceId String?
+  initiatedBy        String
+  approvedBy         String?
+  approvedAt         DateTime?
+  notes              String?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime
+  License            License           @relation(fields: [licenseId], references: [id])
+  WorkflowInstance   WorkflowInstance? @relation(fields: [workflowInstanceId], references: [id])
+
+  @@index([licenseId])
+  @@index([status])
+}
+
+model Memo {
+  id                     String       @id
+  createdById            String
+  status                 MemoStatus   @default(DRAFT)
+  createdAt              DateTime     @default(now())
+  updatedAt              DateTime
+  amountSpent            Decimal?     @db.Decimal(15, 2)
+  attachments            Json?
+  availableFunds         Decimal?     @db.Decimal(15, 2)
+  budgetApproved         String?
+  budgetVote             String?
+  budgetedAmount         Decimal?     @db.Decimal(15, 2)
+  executiveName          String?
+  executiveSignatureDate DateTime?
+  executiveSignaturePath String?
+  financialComments      String?
+  financialVerification  String?
+  memoDate               DateTime     @default(now())
+  memoFrom               String
+  memoFromTitle          String?
+  memoThrough            Json?
+  memoTo                 String
+  memoToTitle            String?
+  priority               MemoPriority @default(NORMAL)
+  procurementActivity    String?
+  purpose                String
+  recommendation         String
+  subject                String
+  title                  String
+  content                String
+  createdBy              User         @relation(fields: [createdById], references: [id])
+
+  @@index([createdById])
+  @@index([memoDate])
+  @@index([status])
+}
+
+model News {
+  id        String   @id
+  title     String
+  content   String
+  authorId  String
+  imageUrl  String?
+  excerpt   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  author    User     @relation(fields: [authorId], references: [id])
+
+  @@index([authorId])
+}
+
+model Objective {
+  id          String       @id
+  title       String
+  description String?
+  goalId      String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime
+  initiatives Initiative[]
+  goal        Goal         @relation(fields: [goalId], references: [id], onDelete: Cascade)
+
+  @@index([goalId])
+}
+
+model PeerRating360 {
+  id          String    @id
+  rating360Id String
+  raterId     String
+  rating      Float?
+  comments    String?
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now())
+  rater       User      @relation(fields: [raterId], references: [id], onDelete: Cascade)
+  rating360   Rating360 @relation(fields: [rating360Id], references: [id], onDelete: Cascade)
+
+  @@unique([rating360Id, raterId])
+  @@index([raterId])
+}
+
+model PerformanceAgreement {
+  id                                           String             @id
+  title                                        String
+  description                                  String?
+  kpi                                          String?
+  target                                       String?
+  customAction                                 String?
+  weight                                       Int?
+  originalWeight                               Int?
+  dueDate                                      DateTime
+  userId                                       String
+  status                                       String             @default("NOT_STARTED")
+  percentComplete                              Int                @default(0)
+  evidenceUrl                                  String?
+  evidenceNotes                                String?
+  rating                                       Int?
+  supervisorId                                 String?
+  approvalStatus                               String?
+  approvedAt                                   DateTime?
+  isLocked                                     Boolean            @default(false)
+  confirmedAt                                  DateTime?
+  isDiscontinued                               Boolean            @default(false)
+  discontinuedAt                               DateTime?
+  progressNotes                                String?
+  completedAt                                  DateTime?
+  initiativeId                                 String?
+  performancePeriodId                          String?
+  isAdhocContainer                             Boolean            @default(false)
+  isSystemGenerated                            Boolean            @default(false)
+  createdAt                                    DateTime           @default(now())
+  updatedAt                                    DateTime
+  initiative                                   Initiative?        @relation(fields: [initiativeId], references: [id], onDelete: Cascade)
+  performancePeriod                             PerformancePeriod? @relation(fields: [performancePeriodId], references: [id])
+  supervisor                                   User?              @relation("PerformanceAgreement_supervisorIdToUser", fields: [supervisorId], references: [id])
+  user                                         User               @relation("PerformanceAgreement_userIdToUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([initiativeId])
+  @@index([isAdhocContainer])
+  @@index([performancePeriodId])
+  @@index([status])
+  @@index([supervisorId])
+  @@index([userId])
+  @@index([userId, initiativeId])
+}
+
+model PerformancePeriod {
+  id                   String                 @id
+  name                 String
+  submissionDeadline   DateTime
+  startDate            DateTime
+  endDate              DateTime
+  isActive             Boolean                @default(true)
+  adhocWeight          Int                    @default(10)
+  projectsWeight       Int                    @default(10)
+  riskManagementWeight Int                    @default(10)
+  rating360Weight      Int                    @default(10)
+  createdById          String
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime
+  performanceAgreements PerformanceAgreement[]
+  createdBy              User                   @relation(fields: [createdById], references: [id])
+  userTaskWeights        UserTaskWeight[]
+  trainingNeeds          TrainingNeed[]         @relation("TrainingNeed_performancePeriodIdToPerformancePeriod")
+
+  @@index([createdById])
+  @@index([submissionDeadline])
+}
+
+model PerformanceReview {
+  id                                      String   @id
+  userId                                  String
+  reviewerId                              String
+  reviewDate                              DateTime
+  feedback                                String
+  rating                                  Int
+  reviewer User     @relation("PerformanceReview_reviewerIdToUser", fields: [reviewerId], references: [id])
+  user     User     @relation("PerformanceReview_userIdToUser", fields: [userId], references: [id])
+}
+
+model Permission {
+  id             String           @id
+  name           String           @unique
+  description    String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime
+  RolePermission RolePermission[]
+}
+
+model PmsAuditLog {
+  id         String      @id
+  actorId    String?
+  entityType String
+  entityId   String
+  action     AuditAction
+  beforeData Json?
+  afterData  Json?
+  reason     String?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime    @default(now())
+  actor      User?       @relation(fields: [actorId], references: [id])
+
+  @@index([actorId])
+  @@index([createdAt])
+  @@index([entityType, entityId])
+}
+
+model PmsNotification {
+  id                                    String             @id
+  type                                  NotificationType
+  status                                NotificationStatus @default(PENDING)
+  senderId                              String?
+  receiverId                            String
+  entityType                            String?
+  entityId                              String?
+  message                               String
+  metadata                              Json?
+  createdAt                             DateTime           @default(now())
+  updatedAt                             DateTime
+  receiver User               @relation("PmsNotification_receiverIdToUser", fields: [receiverId], references: [id])
+  sender   User?              @relation("PmsNotification_senderIdToUser", fields: [senderId], references: [id])
+
+  @@index([createdAt])
+  @@index([receiverId, status])
+  @@index([senderId])
+}
+
+model PolicyDocument {
+  id            String   @id
+  title         String
+  description   String
+  category      String
+  version       String
+  effectiveDate String
+  fileSize      String
+  pdfPath       String
+  createdById   String
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime
+  createdBy     User     @relation(fields: [createdById], references: [id])
+
+  @@index([category])
+  @@index([createdById])
+  @@index([isActive])
+}
+
+model Project {
+  id                             String              @id
+  title                          String
+  description                    String?
+  status                         String              @default("PLANNING")
+  priority                       String              @default("MEDIUM")
+  percentComplete                Int                 @default(0)
+  plannedStartDate               DateTime?
+  plannedEndDate                 DateTime?
+  actualStartDate                DateTime?
+  actualEndDate                  DateTime?
+  budget                         Float?
+  currency                       String              @default("NAD")
+  ownerId                        String
+  createdById                    String
+  departmentId                   String?
+  divisionId                     String?
+  createdAt                      DateTime            @default(now())
+  updatedAt                      DateTime            @default(now())
+  createdByUser                  User                @relation("Project_createdByIdToUser", fields: [createdById], references: [id], onUpdate: NoAction)
+  department                     Department?         @relation(fields: [departmentId], references: [id], onUpdate: NoAction)
+  owner                          User                @relation("Project_ownerIdToUser", fields: [ownerId], references: [id], onUpdate: NoAction)
+  documents                      ProjectDocument[]
+  issues                         ProjectIssue[]
+  risks                          ProjectRisk[]
+  tasks                          ProjectTask[]
+  teamMembers                    ProjectTeamMember[]
+
+  @@index([departmentId])
+  @@index([ownerId])
+  @@index([status])
+}
+
+model ProjectDocument {
+  id        String   @id
+  projectId String
+  title     String
+  url       String?
+  fileType  String?
+  createdAt DateTime @default(now())
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([projectId])
+}
+
+model ProjectIssue {
+  id          String   @id
+  projectId   String
+  title       String
+  description String?
+  severity    String   @default("MEDIUM")
+  status      String   @default("OPEN")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([projectId])
+}
+
+model ProjectRisk {
+  id          String   @id
+  projectId   String
+  title       String
+  description String?
+  severity    String   @default("MEDIUM")
+  status      String   @default("OPEN")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([projectId])
+}
+
+model ProjectTask {
+  id               String    @id
+  projectId        String
+  title            String
+  description      String?
+  status           String    @default("NOT_STARTED")
+  priority         String    @default("MEDIUM")
+  percentComplete  Int       @default(0)
+  plannedStartDate DateTime?
+  plannedEndDate   DateTime?
+  estimatedHours   Float?
+  assignedToId     String?
+  phaseId          String?
+  phaseName        String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @default(now())
+  assignedTo       User?     @relation(fields: [assignedToId], references: [id], onUpdate: NoAction)
+  project          Project   @relation(fields: [projectId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([assignedToId])
+  @@index([projectId])
+}
+
+model ProjectTeamMember {
+  id        String   @id
+  projectId String
+  userId    String
+  role      String?
+  createdAt DateTime @default(now())
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user      User     @relation(fields: [userId], references: [id], onUpdate: NoAction)
+
+  @@unique([projectId, userId])
+  @@index([userId])
+}
+
+model QuestionnaireOpenEnded {
+  id                             String                           @id
+  sectionId                      String
+  question                       String
+  order                          Int
+  isRequired                     Boolean                          @default(false)
+  createdAt                      DateTime                         @default(now())
+  updatedAt                      DateTime                         @default(now())
+  QuestionnaireSection           QuestionnaireSection             @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  QuestionnaireOpenEndedResponse QuestionnaireOpenEndedResponse[]
+
+  @@index([order])
+  @@index([sectionId])
+}
+
+model QuestionnaireOpenEndedResponse {
+  id                     String                 @id
+  questionId             String
+  rating360Id            String
+  raterId                String
+  raterType              String
+  response               String
+  createdAt              DateTime               @default(now())
+  updatedAt              DateTime               @default(now())
+  QuestionnaireOpenEnded QuestionnaireOpenEnded @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([questionId, rating360Id, raterId, raterType], map: "QuestionnaireOpenEndedResponse_questionId_rating360Id_raterId_r")
+  @@index([raterId])
+  @@index([rating360Id])
+}
+
+model QuestionnaireQuestion {
+  id                      String                  @id
+  subsectionId            String
+  statement               String
+  order                   Int
+  requiresComment         Boolean                 @default(false)
+  createdAt               DateTime                @default(now())
+  updatedAt               DateTime                @default(now())
+  QuestionnaireSubsection QuestionnaireSubsection @relation(fields: [subsectionId], references: [id], onDelete: Cascade)
+  QuestionnaireResponse   QuestionnaireResponse[]
+
+  @@index([order])
+  @@index([subsectionId])
+}
+
+model QuestionnaireResponse {
+  id                    String                @id
+  questionId            String
+  rating360Id           String
+  raterId               String
+  raterType             String
+  rating                Float
+  comment               String?
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @default(now())
+  QuestionnaireQuestion QuestionnaireQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([questionId, rating360Id, raterId, raterType], map: "QuestionnaireResponse_questionId_rating360Id_raterId_raterType_")
+  @@index([raterId])
+  @@index([rating360Id])
+}
+
+model QuestionnaireSection {
+  id                      String                    @id
+  templateId              String
+  title                   String
+  description             String?
+  order                   Int
+  createdAt               DateTime                  @default(now())
+  updatedAt               DateTime                  @default(now())
+  QuestionnaireOpenEnded  QuestionnaireOpenEnded[]
+  QuestionnaireTemplate   QuestionnaireTemplate     @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  QuestionnaireSubsection QuestionnaireSubsection[]
+
+  @@index([order])
+  @@index([templateId])
+}
+
+model QuestionnaireSubsection {
+  id                    String                  @id
+  sectionId             String
+  title                 String
+  description           String?
+  institutionalValue    String?
+  order                 Int
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @default(now())
+  QuestionnaireQuestion QuestionnaireQuestion[]
+  QuestionnaireSection  QuestionnaireSection    @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  @@index([order])
+  @@index([sectionId])
+}
+
+model QuestionnaireTemplate {
+  id                   String                 @id
+  name                 String
+  description          String?
+  instructions         String?
+  ratingScaleDesc      String?
+  isActive             Boolean                @default(true)
+  isDefault            Boolean                @default(false)
+  createdBy            String
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @default(now())
+  QuestionnaireSection QuestionnaireSection[]
+
+  @@index([isActive])
+  @@index([isDefault])
+}
+
+model Rating360 {
+  id                                String                 @id
+  cycleId                           String
+  userId                            String
+  selfRating                        Float?
+  selfComments                      String?
+  selfCompletedAt                   DateTime?
+  supervisorId                      String?
+  supervisorRating                  Float?
+  supervisorComments                String?
+  supervisorCompletedAt             DateTime?
+  averageRating                     Float?
+  status                            String                 @default("PENDING")
+  createdAt                         DateTime               @default(now())
+  updatedAt                         DateTime               @default(now())
+  peerRatings                       PeerRating360[]
+  cycle                              Rating360Cycle         @relation(fields: [cycleId], references: [id], onDelete: Cascade)
+  supervisor                         User?                  @relation("Rating360_supervisorIdToUser", fields: [supervisorId], references: [id])
+  user                               User                   @relation("Rating360_userIdToUser", fields: [userId], references: [id], onDelete: Cascade)
+  subordinateRatings                 SubordinateRating360[]
+
+  @@unique([cycleId, userId])
+  @@index([status])
+  @@index([supervisorId])
+  @@index([userId])
+}
+
+model Rating360Answer {
+  id                String            @id
+  questionId        String
+  rating360Id       String
+  raterId           String
+  raterType         String
+  rating            Float
+  comments          String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @default(now())
+  question Rating360Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([questionId, rating360Id, raterId, raterType])
+  @@index([raterId])
+  @@index([rating360Id])
+}
+
+model Rating360Category {
+  id          String   @id
+  name        String   @unique
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+
+  @@index([isActive])
+}
+
+model Rating360Cycle {
+  id          String      @id
+  name        String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean     @default(true)
+  createdById String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @default(now())
+  ratings     Rating360[]
+  createdBy   User        @relation(fields: [createdById], references: [id])
+
+  @@index([isActive])
+}
+
+model Rating360Question {
+  id              String            @id
+  question        String
+  category        String
+  applicableTo    String
+  isActive        Boolean           @default(true)
+  order           Int               @default(0)
+  createdById     String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @default(now())
+  answers         Rating360Answer[]
+  createdBy       User              @relation(fields: [createdById], references: [id])
+
+  @@index([applicableTo])
+  @@index([category])
+  @@index([isActive])
+}
+
+model Refreshment {
+  id           String    @id
+  name         String
+  category     String?
+  dateAdded    DateTime?
+  expiryDate   DateTime?
+  quantity     Int       @default(0)
+  givenOut     Int       @default(0)
+  supplier     String?
+  departmentId String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @default(now())
+}
+
+model RefreshmentRequest {
+  id                String    @id
+  requestId         String
+  mode              String    @default("SINGLE_ITEM")
+  refreshmentId     String?
+  quantityRequested Int?
+  itemsDescription  String?
+  eventDate         DateTime?
+  purpose           String
+  Request           Request   @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@index([requestId])
+}
+
+model Request {
+  id                 String               @id
+  requestNumber      String               @unique
+  type               RequestType
+  title              String
+  description        String?
+  requesterId        String
+  status             RequestStatus        @default(PENDING)
+  priority           Priority             @default(NORMAL)
+  approvedBy         String?
+  approvedAt         DateTime?
+  rejectionReason    String?
+  requestDate        DateTime             @default(now())
+  requiredDate       DateTime?
+  completedAt        DateTime?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @default(now())
+  approvalReason     String?
+  BoardroomRequest   BoardroomRequest[]
+  ITEquipmentRequest ITEquipmentRequest[]
+  RefreshmentRequest RefreshmentRequest[]
+  VehicleRequest     VehicleRequest?
+  requester          User                 @relation("RequestRequester", fields: [requesterId], references: [id])
+}
+
+model RiskDocument {
+  id                                   String     @id
+  title                                String
+  filename                             String
+  fileUrl                              String
+  fileType                             String
+  fileSize                             Int
+  description                          String?
+  departmentName                       String?
+  divisionName                         String?
+  status                               String     @default("ACTIVE")
+  uploadedById                         String
+  distributedToIds                     String[]   @default([])
+  createdAt                            DateTime   @default(now())
+  updatedAt                            DateTime
+  User_RiskDocument_uploadedByIdToUser User       @relation("RiskDocument_uploadedByIdToUser", fields: [uploadedById], references: [id])
+  RiskTask                             RiskTask[]
+  User_DistributedRiskDocuments        User[]     @relation("DistributedRiskDocuments")
+
+  @@index([status])
+  @@index([uploadedById])
+}
+
+model RiskTask {
+  id                               String        @id
+  title                            String
+  description                      String?
+  riskCategory                     String
+  riskDescription                  String?
+  cause                            String?
+  impact                           String?
+  likelihood                       String        @default("POSSIBLE")
+  impactLevel                      String        @default("MODERATE")
+  riskScore                        Int?
+  mitigations                      String?
+  furtherActions                   String?
+  priority                         String        @default("MEDIUM")
+  dueDate                          DateTime?
+  assignedToId                     String
+  createdById                      String
+  status                           String        @default("NOT_STARTED")
+  percentComplete                  Int           @default(0)
+  evidenceUrl                      String?
+  evidenceNotes                    String?
+  rating                           Int?
+  approvalStatus                   String?       @default("PENDING")
+  approvedById                     String?
+  approvedAt                       DateTime?
+  progressNotes                    String?
+  completedAt                      DateTime?
+  documentId                       String?
+  createdAt                        DateTime      @default(now())
+  updatedAt                        DateTime
+  User_RiskTask_approvedByIdToUser User?         @relation("RiskTask_approvedByIdToUser", fields: [approvedById], references: [id])
+  User_RiskTask_assignedToIdToUser User          @relation("RiskTask_assignedToIdToUser", fields: [assignedToId], references: [id], onDelete: Cascade)
+  User_RiskTask_createdByIdToUser  User          @relation("RiskTask_createdByIdToUser", fields: [createdById], references: [id])
+  RiskDocument                     RiskDocument? @relation(fields: [documentId], references: [id])
+
+  @@index([approvedById])
+  @@index([assignedToId])
+  @@index([createdById])
+  @@index([documentId])
+  @@index([status])
+}
+
+model Role {
+  id             String           @id
+  name           String           @unique
+  description    String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime
+  RolePermission RolePermission[]
+  UserRole       UserRole[]
+}
+
+model RolePermission {
+  id           String     @id
+  roleId       String
+  permissionId String
+  assignedAt   DateTime   @default(now())
+  Permission   Permission @relation(fields: [permissionId], references: [id])
+  Role         Role       @relation(fields: [roleId], references: [id])
+
+  @@unique([roleId, permissionId])
+}
+
+model StatusHistory {
+  id         String        @id
+  targetId   String
+  oldStatus  TargetStatus?
+  newStatus  TargetStatus
+  oldPercent Int?
+  newPercent Int
+  notes      String?
+  changedBy  String
+  createdAt  DateTime      @default(now())
+  changedByUser User       @relation(fields: [changedBy], references: [id])
+  target         Target     @relation(fields: [targetId], references: [id], onDelete: Cascade)
+
+  @@index([changedBy])
+  @@index([createdAt])
+  @@index([targetId])
+}
+
+model SubordinateRating360 {
+  id          String    @id
+  rating360Id String
+  raterId     String
+  rating      Float?
+  comments    String?
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now())
+  rater       User      @relation(fields: [raterId], references: [id], onDelete: Cascade)
+  rating360   Rating360 @relation(fields: [rating360Id], references: [id], onDelete: Cascade)
+
+  @@unique([rating360Id, raterId])
+  @@index([raterId])
+}
+
+model System {
+  id          String    @id
+  name        String    @unique
+  description String?
+  category    String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime
+  License     License[]
+}
+
+model Target {
+  id                              String          @id
+  title                           String
+  description                     String?
+  isAdhoc                         Boolean         @default(false)
+  initiativeId                    String?
+  responsibleId                   String
+  status                          TargetStatus    @default(NOT_STARTED)
+  percentComplete                 Int             @default(0)
+  dueDate                         DateTime?
+  completedAt                     DateTime?
+  progressNotes                   String?
+  staffRating                     Int?
+  evidenceUrl                     String?
+  evidenceNotes                   String?
+  submittedForApproval            DateTime?
+  approvalStatus                  ApprovalStatus  @default(PENDING)
+  approvedBy                      String?
+  approvedAt                      DateTime?
+  supervisorRating                Int?
+  rejectionReason                 String?
+  createdAt                       DateTime        @default(now())
+  updatedAt                       DateTime
+  statusHistory                   StatusHistory[]
+  approver                        User?           @relation("Target_approvedByToUser", fields: [approvedBy], references: [id])
+  initiative                      Initiative?     @relation(fields: [initiativeId], references: [id], onDelete: Cascade)
+  responsible                     User            @relation("Target_responsibleIdToUser", fields: [responsibleId], references: [id])
+
+  @@index([approvalStatus])
+  @@index([approvedBy])
+  @@index([dueDate])
+  @@index([initiativeId])
+  @@index([responsibleId])
+  @@index([status])
+}
+
+model Task {
+  id           String         @id
+  title        String
+  description  String
+  assignedToId String
+  dueDate      DateTime
+  status       TaskStatus
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime
+  LicenseAlert LicenseAlert[]
+  User         User           @relation(fields: [assignedToId], references: [id])
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model User {
+  id                                                           String                 @id
+  username                                                     String                 @unique
+  email                                                        String                 @unique
+  password                                                     String
+  createdAt                                                    DateTime               @default(now())
+  updatedAt                                                    DateTime
+  employeeCode                                                 String?                @unique
+  firstName                                                    String?
+  lastName                                                     String?
+  position                                                     String?
+  subDivision                                                  String?
+  adDN                                                         String?
+  adGroups                                                     Json?
+  adGuid                                                       String?                @unique
+  adUsername                                                   String?
+  departmentId                                                 String?
+  lastAdSync                                                   DateTime?
+  managerId                                                    String?
+  status                                                       UserStatus             @default(ACTIVE)
+  lastLoginAt                                                  DateTime?
+  jobTitle                                                     String?
+  departmentName                                               String?
+  divisionName                                                 String?
+  companyName                                                  String?
+  signatureUrl                                                 String?
+  profilePictureUrl                                            String?
+  AdhocTask_AdhocTask_approvedByIdToUser                       AdhocTask[]            @relation("AdhocTask_approvedByIdToUser")
+  AdhocTask_AdhocTask_assignedToIdToUser                       AdhocTask[]            @relation("AdhocTask_assignedToIdToUser")
+  AdhocTask_AdhocTask_createdByIdToUser                        AdhocTask[]            @relation("AdhocTask_createdByIdToUser")
+  AuditTask_AuditTask_approvedByIdToUser                       AuditTask[]            @relation("AuditTask_approvedByIdToUser")
+  AuditTask_AuditTask_assignedToIdToUser                       AuditTask[]            @relation("AuditTask_assignedToIdToUser")
+  AuditTask_AuditTask_createdByIdToUser                        AuditTask[]            @relation("AuditTask_createdByIdToUser")
+  DashboardEvent                                               DashboardEvent[]
+  DashboardNews                                                DashboardNews[]
+  DashboardNotice                                              DashboardNotice[]
+  LeaveRequest                                                 LeaveRequest[]
+  Memo                                                         Memo[]
+  News                                                         News[]
+  PeerRating360                                                PeerRating360[]
+  PerformanceAgreement_PerformanceAgreement_supervisorIdToUser PerformanceAgreement[] @relation("PerformanceAgreement_supervisorIdToUser")
+  PerformanceAgreement_PerformanceAgreement_userIdToUser       PerformanceAgreement[] @relation("PerformanceAgreement_userIdToUser")
+  PerformancePeriod                                            PerformancePeriod[]
+  PerformanceReview_PerformanceReview_reviewerIdToUser         PerformanceReview[]    @relation("PerformanceReview_reviewerIdToUser")
+  PerformanceReview_PerformanceReview_userIdToUser             PerformanceReview[]    @relation("PerformanceReview_userIdToUser")
+  PmsAuditLog                                                  PmsAuditLog[]
+  PmsNotification_PmsNotification_receiverIdToUser             PmsNotification[]      @relation("PmsNotification_receiverIdToUser")
+  PmsNotification_PmsNotification_senderIdToUser               PmsNotification[]      @relation("PmsNotification_senderIdToUser")
+  PolicyDocument                                               PolicyDocument[]
+  Project_Project_createdByIdToUser                            Project[]              @relation("Project_createdByIdToUser")
+  Project_Project_ownerIdToUser                                Project[]              @relation("Project_ownerIdToUser")
+  ProjectTask                                                  ProjectTask[]
+  ProjectTeamMember                                            ProjectTeamMember[]
+  Rating360_Rating360_supervisorIdToUser                       Rating360[]            @relation("Rating360_supervisorIdToUser")
+  Rating360_Rating360_userIdToUser                             Rating360[]            @relation("Rating360_userIdToUser")
+  Rating360Cycle                                               Rating360Cycle[]
+  Rating360Question                                            Rating360Question[]
+  RiskDocument_RiskDocument_uploadedByIdToUser                 RiskDocument[]         @relation("RiskDocument_uploadedByIdToUser")
+  RiskTask_RiskTask_approvedByIdToUser                         RiskTask[]             @relation("RiskTask_approvedByIdToUser")
+  RiskTask_RiskTask_assignedToIdToUser                         RiskTask[]             @relation("RiskTask_assignedToIdToUser")
+  RiskTask_RiskTask_createdByIdToUser                          RiskTask[]             @relation("RiskTask_createdByIdToUser")
+  StatusHistory                                                StatusHistory[]
+  SubordinateRating360                                         SubordinateRating360[]
+  Target_Target_approvedByToUser                               Target[]               @relation("Target_approvedByToUser")
+  Target_Target_responsibleIdToUser                            Target[]               @relation("Target_responsibleIdToUser")
+  Task                                                         Task[]
+  TrainingNeed                                                 TrainingNeed[]         @relation("TrainingNeed_userIdToUser")
+  department                                                   Department?            @relation(fields: [departmentId], references: [id])
+  manager                                                      User?                  @relation("UserToUser", fields: [managerId], references: [id])
+  managedUsers                                                 User[]                 @relation("UserToUser")
+  roles                                                        UserRole[]
+  requestsMade                                                 Request[]              @relation("RequestRequester")
+  UserTaskWeight_UserTaskWeight_approvedByIdToUser             UserTaskWeight[]       @relation("UserTaskWeight_approvedByIdToUser")
+  UserTaskWeight_UserTaskWeight_userIdToUser                   UserTaskWeight[]       @relation("UserTaskWeight_userIdToUser")
+  WelcomeLink                                                  WelcomeLink[]
+  WorkflowAction                                               WorkflowAction[]
+  WorkflowAssignment                                           WorkflowAssignment[]
+  WorkflowInstance                                             WorkflowInstance[]
+  RiskDocument_DistributedRiskDocuments                        RiskDocument[]         @relation("DistributedRiskDocuments")
+}
+
+model UserRole {
+  id         String   @id
+  userId     String
+  roleId     String
+  assignedAt DateTime @default(now())
+  role       Role     @relation(fields: [roleId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, roleId])
+}
+
+model UserTaskWeight {
+  id                                     String             @id
+  userId                                 String
+  periodId                               String?
+  categories                             String             @default("[]")
+  isApproved                             Boolean            @default(false)
+  approvedById                           String?
+  approvedAt                             DateTime?
+  createdAt                              DateTime           @default(now())
+  updatedAt                              DateTime           @default(now())
+  pendingCategories                      String?
+  User_UserTaskWeight_approvedByIdToUser User?              @relation("UserTaskWeight_approvedByIdToUser", fields: [approvedById], references: [id])
+  PerformancePeriod                      PerformancePeriod? @relation(fields: [periodId], references: [id])
+  User_UserTaskWeight_userIdToUser       User               @relation("UserTaskWeight_userIdToUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, periodId])
+  @@index([periodId])
+  @@index([userId])
+}
+
+model Vacancy {
+  id           String        @id
+  title        String
+  description  String
+  departmentId String
+  requirements String?
+  salary       Float?
+  closingDate  DateTime?
+  status       VacancyStatus @default(OPEN)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime
+  Department   Department    @relation(fields: [departmentId], references: [id])
+
+  @@index([departmentId])
+}
+
+model Vehicle {
+  id             String           @id
+  make           String
+  model          String
+  licensePlate   String           @unique
+  year           String?
+  isAvailable    Boolean          @default(true)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime
+  VehicleRequest VehicleRequest[]
+}
+
+model VehicleRequest {
+  id          String   @id
+  requestId   String   @unique
+  vehicleId   String?
+  startDate   DateTime
+  endDate     DateTime
+  destination String
+  purpose     String
+  Request     Request  @relation(fields: [requestId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Vehicle     Vehicle? @relation(fields: [vehicleId], references: [id], onUpdate: NoAction)
+}
+
+model Vendor {
+  id          String    @id
+  name        String    @unique
+  contactName String?
+  email       String?
+  phone       String?
+  website     String?
+  notes       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime
+  License     License[]
+}
+
+model WelcomeLink {
+  id          String   @id
+  title       String
+  description String
+  url         String
+  icon        String?
+  order       Int      @default(0)
+  createdById String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime
+  User        User     @relation(fields: [createdById], references: [id])
+
+  @@index([createdById])
+  @@index([isActive])
+  @@index([order])
+}
+
+model WorkflowAction {
+  id                 String           @id
+  workflowInstanceId String
+  action             String
+  fromState          String?
+  toState            String
+  performedBy        String
+  comment            String?
+  metadata           Json?
+  performedAt        DateTime         @default(now())
+  User               User             @relation(fields: [performedBy], references: [id])
+  WorkflowInstance   WorkflowInstance @relation(fields: [workflowInstanceId], references: [id], onDelete: Cascade)
+
+  @@index([performedBy])
+  @@index([workflowInstanceId])
+}
+
+model WorkflowAssignment {
+  id                 String           @id
+  workflowInstanceId String
+  assignedTo         String
+  stepName           String
+  state              String
+  status             AssignmentStatus @default(PENDING)
+  isActive           Boolean          @default(true)
+  assignedAt         DateTime         @default(now())
+  dueAt              DateTime?
+  completedAt        DateTime?
+  action             String?
+  comment            String?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime
+  User               User             @relation(fields: [assignedTo], references: [id])
+  WorkflowInstance   WorkflowInstance @relation(fields: [workflowInstanceId], references: [id], onDelete: Cascade)
+
+  @@index([assignedTo, status])
+  @@index([isActive])
+  @@index([workflowInstanceId])
+}
+
+model WorkflowDefinition {
+  id               String             @id
+  name             String             @unique
+  description      String?
+  module           String
+  version          Int                @default(1)
+  isActive         Boolean            @default(true)
+  category         String?
+  icon             String?
+  config           Json
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime
+  WorkflowInstance WorkflowInstance[]
+  WorkflowStep     WorkflowStep[]
+
+  @@index([isActive])
+  @@index([module])
+}
+
+model WorkflowInstance {
+  id                   String                 @id
+  workflowDefinitionId String
+  title                String
+  referenceNumber      String                 @unique
+  currentState         String
+  createdBy            String
+  status               WorkflowInstanceStatus @default(ACTIVE)
+  priority             Priority               @default(NORMAL)
+  formData             Json
+  metadata             Json?
+  startedAt            DateTime               @default(now())
+  completedAt          DateTime?
+  dueDate              DateTime?
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime
+  LicenseRenewal       LicenseRenewal[]
+  WorkflowAction       WorkflowAction[]
+  WorkflowAssignment   WorkflowAssignment[]
+  User                 User                   @relation(fields: [createdBy], references: [id])
+  WorkflowDefinition   WorkflowDefinition     @relation(fields: [workflowDefinitionId], references: [id])
+  WorkflowSLA          WorkflowSLA[]
+
+  @@index([createdBy])
+  @@index([currentState])
+  @@index([referenceNumber])
+  @@index([status])
+  @@index([workflowDefinitionId])
+}
+
+model WorkflowSLA {
+  id                   String           @id
+  workflowInstanceId   String
+  stepName             String
+  state                String
+  startedAt            DateTime         @default(now())
+  expectedCompletionAt DateTime
+  completedAt          DateTime?
+  status               SLAStatus        @default(ON_TIME)
+  breached             Boolean          @default(false)
+  breachedAt           DateTime?
+  escalated            Boolean          @default(false)
+  escalatedAt          DateTime?
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime
+  WorkflowInstance     WorkflowInstance @relation(fields: [workflowInstanceId], references: [id], onDelete: Cascade)
+
+  @@index([breached])
+  @@index([status])
+  @@index([workflowInstanceId])
+}
+
+model WorkflowStep {
+  id                   String             @id
+  workflowDefinitionId String
+  name                 String
+  order                Int
+  state                String
+  assignmentType       AssignmentType
+  assignmentConfig     Json
+  requiresApproval     Boolean            @default(true)
+  allowsComment        Boolean            @default(true)
+  canEdit              Boolean            @default(false)
+  expectedDuration     Int?
+  escalationDuration   Int?
+  escalationConfig     Json?
+  nextStepsConfig      Json
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime
+  WorkflowDefinition   WorkflowDefinition @relation(fields: [workflowDefinitionId], references: [id], onDelete: Cascade)
+
+  @@unique([workflowDefinitionId, order])
+  @@index([workflowDefinitionId])
+}
+
+model NewConnectionApplication {
+  id                  String   @id @default(cuid())
+  reference           String   @unique
+  quotationRef        String?
+  customerType        String
+  customerName        String
+  priority            String   @default("Normal")
+  customerId          String?
+  phoneNumber         String?
+  emailAddress        String?
+  region              String
+  locality            String
+  constituency        String?
+  keyStakeholder      String?
+  plotErf             String?
+  applicationDate     DateTime
+  receivedDate        DateTime?
+  investigationDate   DateTime?
+  quoteIssuedDate     DateTime?
+  fullPaymentDate     DateTime?
+  assignedDate        DateTime?
+  connectionDate      DateTime?
+  status              String
+  assignedTo          String?
+  nextAction          String?
+  connectionClass     String
+  config              String?
+  connectionType      String
+  projectValue        String?
+  capitalContribution String?
+  mvLength            String?
+  mvConductor         String?
+  lvLength            String?
+  transformerRating   String?
+  voltageRating       String?
+  serviceConnection   String?
+  jobCardNumber       String?
+  coordinates         String?
+  coordinateSource    String?
+  networkReference    String?
+  mapReference        String?
+  meterNumber         String?
+  sealNumber          String?
+  comment             String?
+  createdById         String?
+  createdByName       String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([status])
+  @@index([region])
+  @@index([locality])
+  @@index([constituency])
+  @@index([customerName])
+  @@index([quotationRef])
+  @@index([jobCardNumber])
+  @@index([meterNumber])
+}
+
+enum AlertSeverity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+enum AlertType {
+  EXPIRY_WARNING
+  EXPIRY_CRITICAL
+  EXPIRED
+  RENEWAL_DUE
+  COST_THRESHOLD
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum AssignmentStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  SKIPPED
+}
+
+enum AssignmentType {
+  ROLE
+  USER
+  DYNAMIC
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  APPROVE
+  REJECT
+  SUBMIT
+  COMPLETE
+  LOGIN
+  LOGOUT
+}
+
+enum EquipmentCondition {
+  NEW
+  GOOD
+  FAIR
+  POOR
+  DAMAGED
+  OUT_OF_ORDER
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum LicenseStatus {
+  ACTIVE
+  EXPIRING_SOON
+  EXPIRED
+  CANCELLED
+  SUSPENDED
+}
+
+enum LicenseType {
+  SOFTWARE_LICENSE
+  SUBSCRIPTION
+  SSL_CERTIFICATE
+  SUPPORT_CONTRACT
+  CLOUD_SERVICE
+  API_LICENSE
+}
+
+enum MemoPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum MemoStatus {
+  DRAFT
+  PENDING
+  APPROVED
+  REJECTED
+  ARCHIVED
+  SUBMITTED_TO_MANAGER
+  SUBMITTED_TO_SENIOR
+  SUBMITTED_TO_EXECUTIVE
+  RETURNED_BY_MANAGER
+  RETURNED_BY_SENIOR
+  RETURNED_BY_EXECUTIVE
+  RETURNED_BY_FINANCE
+  RETURNED_BY_SG
+  PENDING_FINANCIAL_REVIEW
+  PENDING_FINANCE_APPROVAL
+  PENDING_SG_APPROVAL
+  SENT_TO_PROCUREMENT
+  COMPLETED
+  RECALLED
+  UNDER_REVIEW
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  READ
+  FAILED
+}
+
+enum NotificationType {
+  TARGET_ASSIGNED
+  TARGET_DUE
+  TARGET_COMPLETED
+  APPROVAL_REQUESTED
+  APPROVED
+  REJECTED
+  OVERDUE
+  REMINDER
+  SYSTEM
+  MEMO_CREATED
+  MEMO_SUBMITTED
+  MEMO_APPROVED
+  MEMO_REJECTED
+  MEMO_REVIEWED
+  MEMO_FORWARDED
+  MEMO_SIGNED
+  MEMO_RETURNED
+  MEMO_PENDING
+  MEMO_SENT
+  MEMO_READ
+  MEMO_UPDATED
+  MEMO_DELETED
+  MEMO_ARCHIVED
+}
+
+enum Priority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum RefreshmentRequestMode {
+  SINGLE_ITEM
+  BULK_EVENT
+}
+
+enum RenewalFrequency {
+  MONTHLY
+  QUARTERLY
+  SEMI_ANNUAL
+  ANNUAL
+  BIENNIAL
+  TRIENNIAL
+  ONE_TIME
+}
+
+enum RenewalStatus {
+  PENDING
+  IN_PROGRESS
+  APPROVED
+  COMPLETED
+  REJECTED
+  CANCELLED
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum RequestType {
+  REFRESHMENT
+  BOARDROOM
+  VEHICLE
+  IT_EQUIPMENT
+}
+
+enum SLAStatus {
+  ON_TIME
+  AT_RISK
+  BREACHED
+}
+
+enum TargetStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  OVERDUE
+  BLOCKED
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  LOCKED
+}
+
+enum VacancyStatus {
+  OPEN
+  CLOSED
+  FILLED
+}
+
+enum WorkflowInstanceStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+  REJECTED
+  CANCELLED
+}
+
+enum TrainingType {
+  TECHNICAL
+  SOFT_SKILLS
+  LEADERSHIP
+  COMPLIANCE
+  OTHER
+}
+
+enum TrainingUrgency {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum TrainingNeedStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
+}
+
+model BoardMember {
+  id           String   @id
+  name         String
+  position     String
+  imageUrl     String?
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now())
+}
+
+model ExecutiveCommittee {
+  id           String   @id
+  name         String
+  position     String
+  imageUrl     String?
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now())
+}
+
+model CoreValue {
+  id           String   @id
+  name         String
+  description  String?
+  icon         String?
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now())
+}
+
+model TrainingNeed {
+  id                String   @id
+  userId            String
+  performancePeriodId String
+  title             String
+  description       String
+  type              TrainingType
+  urgency           TrainingUrgency
+  priority          Int      @default(1)
+  preferredTimeline String?
+  estimatedCost     Decimal?
+  provider          String?
+  status            TrainingNeedStatus @default(PENDING)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @default(now())
+
+  user               User @relation("TrainingNeed_userIdToUser", fields: [userId], references: [id], onDelete: Cascade)
+  performancePeriod  PerformancePeriod @relation("TrainingNeed_performancePeriodIdToPerformancePeriod", fields: [performancePeriodId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([performancePeriodId])
+  @@index([type])
+  @@index([urgency])
+  @@index([status])
+}

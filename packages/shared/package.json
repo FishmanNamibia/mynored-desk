@@ -1,0 +1,18 @@
+{
+  "name": "shared",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "echo 'shared dev'",
+    "dev:https": "echo 'shared dev:https'",
+    "test": "jest --passWithNoTests --watchman=false",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "eslint": "^9.39.2",
+    "jest": "^30.2.0",
+    "typescript": "^4.5.0"
+  },
+  "private": true
+}

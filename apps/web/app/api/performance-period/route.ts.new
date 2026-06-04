@@ -1,0 +1,132 @@
+import { NextRequest, NextResponse } from 'next/server'
+
+export async function GET(req: NextRequest) {
+  try {
+    // Get the original URL and query parameters
+    const { searchParams } = new URL(req.url)
+    const includeHistory = searchParams.get('includeHistory')
+    
+    // Construct the target URL with the same query parameters
+    const targetUrl = `${req.nextUrl.origin}/dashboard/performance/api/performance-period${
+      includeHistory ? `?includeHistory=${includeHistory}` : ''
+    }`
+    
+    // Get cookie header from the request
+    const cookieHeader = req.headers.get('cookie') || ''
+    
+    // Forward the request to the actual API endpoint
+    const response = await fetch(targetUrl, {
+      method: 'GET',
+      headers: {
+        'Cookie': cookieHeader,
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include',
+    })
+    
+    // Check if the response is OK
+    if (!response.ok) {
+      const errorData = await response.json()
+      return NextResponse.json(
+        errorData,
+        { status: response.status }
+      )
+    }
+    
+    // Return the response from the target API
+    const data = await response.json()
+    
+    // Create a response with the data
+    const apiResponse = NextResponse.json(data)
+    
+    // Forward any Set-Cookie headers from the response
+    const setCookieHeader = response.headers.get('set-cookie')
+    if (setCookieHeader) {
+      // Split multiple cookies if they exist
+      const cookies = setCookieHeader.split(', ')
+      for (const cookie of cookies) {
+        apiResponse.headers.append('Set-Cookie', cookie)
+      }
+    }
+    
+    return apiResponse
+  } catch (error) {
+    console.error('Error forwarding performance period request:', error)
+    return NextResponse.json(
+      { error: 'Failed to fetch performance periods' },
+      { status: 500 }
+    )
+  }
+}
+
+// Also implement POST and PATCH methods to forward all operations
+export async function POST(req: NextRequest) {
+  return forwardRequest(req, 'POST')
+}
+
+export async function PATCH(req: NextRequest) {
+  return forwardRequest(req, 'PATCH')
+}
+
+async function forwardRequest(req: NextRequest, method: string) {
+  try {
+    // Get the original URL
+    const { searchParams } = new URL(req.url)
+    const queryString = Array.from(searchParams.entries())
+      .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+      .join('&')
+    
+    // Construct the target URL
+    const targetUrl = `${req.nextUrl.origin}/dashboard/performance/api/performance-period${
+      queryString ? `?${queryString}` : ''
+    }`
+    
+    // Get cookie header and body from the request
+    const cookieHeader = req.headers.get('cookie') || ''
+    const body = await req.json()
+    
+    // Forward the request to the actual API endpoint
+    const response = await fetch(targetUrl, {
+      method,
+      headers: {
+        'Cookie': cookieHeader,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body),
+      credentials: 'include',
+    })
+    
+    // Check if the response is OK
+    if (!response.ok) {
+      const errorData = await response.json()
+      return NextResponse.json(
+        errorData,
+        { status: response.status }
+      )
+    }
+    
+    // Return the response from the target API
+    const data = await response.json()
+    
+    // Create a response with the data
+    const apiResponse = NextResponse.json(data)
+    
+    // Forward any Set-Cookie headers from the response
+    const setCookieHeader = response.headers.get('set-cookie')
+    if (setCookieHeader) {
+      // Split multiple cookies if they exist
+      const cookies = setCookieHeader.split(', ')
+      for (const cookie of cookies) {
+        apiResponse.headers.append('Set-Cookie', cookie)
+      }
+    }
+    
+    return apiResponse
+  } catch (error) {
+    console.error(`Error forwarding ${method} request:`, error)
+    return NextResponse.json(
+      { error: `Failed to ${method.toLowerCase()} performance period` },
+      { status: 500 }
+    )
+  }
+}

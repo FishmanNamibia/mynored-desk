@@ -1,0 +1,11 @@
+packages:
+  - apps/web
+  - apps/api
+  - packages/database
+  - packages/shared
+  - packages/ui
+
+ignoredBuiltDependencies:
+  - "@nestjs/core"
+  - esbuild
+  - sharp

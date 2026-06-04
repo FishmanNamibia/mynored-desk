@@ -1,0 +1,48 @@
+{
+  "name": "mynsa-desk",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "turbo run dev",
+    "dev:https": "turbo run dev:https",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "env:check": "bash scripts/checks/validate-local-env.sh",
+    "ci:quick": "pnpm lint && pnpm test"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^20.0.0",
+    "baseline-browser-mapping": "^2.9.19",
+    "cross-env": "^10.1.0",
+    "eslint": "^9.39.2",
+    "jest": "30.2.0",
+    "prettier": "^2.5.1",
+    "ts-jest": "29.4.6",
+    "turbo": "^2.7.6",
+    "typescript": "5.9.3"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "packageManager": "pnpm@10.28.2",
+  "dependencies": {
+    "@nestjs/config": "^2.3.4",
+    "@nestjs/platform-socket.io": "^9.4.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "axios": "^1.13.3",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.13.2",
+    "dotenv": "^17.2.3",
+    "express-rate-limit": "^8.2.1",
+    "helmet": "^8.1.0",
+    "ioredis": "^5.9.2",
+    "joi": "^18.0.2",
+    "jsonwebtoken": "^9.0.3",
+    "jwks-rsa": "^3.2.2",
+    "nest-winston": "^1.10.2",
+    "winston": "^3.19.0"
+  }
+}
