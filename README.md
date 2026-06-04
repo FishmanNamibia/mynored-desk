@@ -1,6 +1,6 @@
-# MyNSA Desk
+# Mynored Desk
 
-MyNSA Desk is a unified internal digital workplace and ERP-style system designed to streamline various organizational processes. Inspired by Odoo's modular architecture, this project aims to consolidate multiple fragmented systems into a single, cohesive platform.
+MyNORED Desk is a unified internal digital workplace and ERP-style system designed to streamline various organizational processes. Inspired by Odoo's modular architecture, this project aims to consolidate multiple fragmented systems into a single, cohesive platform.
 
 ## Features
 
@@ -28,12 +28,9 @@ The project is organized into several key directories:
 
 ## Getting Started
 
-To get started with MyNSA Desk, follow these steps:
+To get started with Mynored Desk, follow these steps:
 
-1. **Clone the repository:**
-   ```sh
-   git clone git@github.com:Namibia-Statistics-Agency-NHIS/my_nsa_desk.git
-   cd mynsa-desk
+1
    ```
 
 2. **Install dependencies:**
